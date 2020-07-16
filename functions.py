@@ -15,7 +15,7 @@ class Functions(object):
     def delete_db(self):#删除数据库
         pass
 #=============================[集合操作]=======================================#
-    def load_collection_names(self,db):#加载集合名称
+    def load_col_names(self,db):#加载集合名称
         return db.list_collection_names()
 
     def create_col(self,db):#创建集合
@@ -29,5 +29,9 @@ class Functions(object):
 
     def write(self,col):#写入数据
         pass
+
+    def delete(self,col):#删除数据
+        pass
 #=============================[其他功能]=======================================#
-    pass
+    def get_help(self):#打开帮助文档
+        pass
