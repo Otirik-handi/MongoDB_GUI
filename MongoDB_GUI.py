@@ -26,13 +26,6 @@ class MongoDB_GUI(object):
         self.menubar.add_cascade(label='Help',menu=self.helpmenu)
         self.root.config(menu=self.menubar)
 
-    #def set_frame(self):
-    #    self.db_frame = Frame(self.root)
-    #    self.data_frame = Frame(self.root)
-    #  
-    #    self.db_frame.place(x=0,y=0,anchor='nw')
-    #    self.data_frame.place(x=450,y=0,anchor='nw')
-
     def set_text(self):
         self.input_text = Text(self.root,width=60,height=18)
         self.data_text = Text(self.root,height=43)
@@ -63,16 +56,14 @@ class MongoDB_GUI(object):
 
         self.db_list.place(x=0,y=25,anchor='nw')
 
-        col = ['col%d' % i for i in range(20)]
-
-        for c in col:
-            self.col_list.insert('end',c)
+        for col in self.func.load_col_names(self.db_list):
+            self.col_list.insert('end',col)
 
         self.col_list.place(x=150,y=25,anchor='nw')
 
     def set_button(self):
-        self.b_create_db = Button(self.root,width=15,height=1,text='create database')
-        self.b_delete_db = Button(self.root,width=15,height=1,text='delete database')
+        self.b_create_db = Button(self.root,width=15,height=1,text='create database',command=self.func.create_db())
+        self.b_delete_db = Button(self.root,width=15,height=1,text='delete database',command=lambda:self.func.delete_db(self.db_list))
         self.b_create_col = Button(self.root,width=15,height=1,text='create collection')
         self.b_delete_col = Button(self.root,width=15,height=1,text='delete collection')
         self.b_commit_data = Button(self.root,width=25,height=2,text='commit')
