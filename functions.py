@@ -1,6 +1,7 @@
 import pymongo
 from tkinter import *
 from tkinter import messagebox
+from tkinter.simpledialog import askstring
 class Functions(object):
 
     def __init__(self,path):
@@ -10,22 +11,27 @@ class Functions(object):
     def load_db_names(self):#加载数据库名称
         return self.mongo.list_database_names()
 
-    def create_db(self,entry):#创建数据库
+    def create_db(self,db_list):#创建数据库
         try:
-            e = Entry(Tk())
-            e.pack()
-            db_name = e.get()
+            db_name = askstring('','你想要创建的数据库的名字:')
             db = self.mongo[db_name]
-            e.delete(0,'end')
+            col = db['None']
+            col.insert_one({'None':'None'})
+            messagebox.showinfo('成功','成功创建数据库"%s"'%db_name)
+            db_list.insert(0,db_name)
         except Exception as e:
             messagebox.showerror('Error',e)
 
-    def delete_db(self,db_list):#删除数据库
+    def delete_db(self,db_list,col_list):#删除数据库
         try:
             db_name = db_list.get('active')
-            self.mongo.drop_database(db_name)
-            listbox.delete(db_list.index('active'))
-            messagebox.showinfo('删除成功','Database %s 已删除'%db_name)
+            boolvalue = messagebox.askokcancel('警告','是否删除数据库%s,这样做会失去宝贵的数据'%db_name)
+            print(boolvalue)
+            if boolvalue:
+                self.mongo.drop_database(db_name)
+                db_list.delete(db_list.index('active'))
+                messagebox.showinfo('删除成功','Database %s 已删除'%db_name)
+                col_list.delete(0,last='end')
         except Exception as e:
             messagebox.showerror('Error',e)
             
@@ -34,11 +40,29 @@ class Functions(object):
         db = self.mongo[db_list.get('active')]
         return db.list_collection_names()
 
-    def create_col(self,db):#创建集合
-        pass
+    def create_col(self,db_list,col_list):#创建集合
+        try:
+            db = self.mongo[db_list.get('active')]
+            col_name = askstring('','你想要创建的集合的名字:')
+            col = db[col_name]
+            col.insert_one({'None':'None'})
+            messagebox.showinfo('成功','成功创建集合"%s"'%col_name)
+            col_list.insert(0,col_name)
+        except Exception as e:
+            messagebox.showerror('Error',e)
 
-    def delete_col(self,db):#删除集合
-        pass
+    def delete_col(self,db_list,col_list):#删除集合
+        try:
+            db_name = db_list.get('active')
+            col_name = col_list.get('active')
+            boolvalue = messagebox.askokcancel('警告','是否删除集合%s,这样做会失去宝贵的数据'%col_name)
+            print(boolvalue)
+            if boolvalue:
+                self.mongo[db_name][col_name].drop()
+                col_list.delete(col_list.index('active'))
+                messagebox.showinfo('删除成功','集合 %s 已删除'%col_name)
+        except Exception as e:
+            messagebox.showerror('Error',e)
 #=============================[数据操作]=======================================#
     def read(self,col):#读取数据
         pass

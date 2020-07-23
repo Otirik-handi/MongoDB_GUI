@@ -23,21 +23,21 @@ class MongoDB_GUI(object):
         self.helpmenu.add_command(label='For Help',command=self.func.get_help)
         #待添加
         self.menubar.add_cascade(label='File',menu=self.filemenu)
-        self.menubar.add_cascade(label='Help',menu=self.helpmenu)
+        self.menubar.add_cascade(label='帮助',menu=self.helpmenu)
         self.root.config(menu=self.menubar)
 
     def set_text(self):
-        self.input_text = Text(self.root,width=60,height=18)
-        self.data_text = Text(self.root,height=43)
+        self.input_text = Text(self.root,width=60,height=18,undo=True)
+        self.data_text = Text(self.root,height=43,state='disabled')
 
         self.input_text.place(x=0,y=298,anchor='nw')
         self.data_text.place(x=430,y=25,anchor='nw')
 
     def set_label(self):
-        self.db_label = Label(self.root,text='Datebases',bg='white',font=('Arial',12),)
-        self.col_label = Label(self.root,text='Collections',bg='white',font=('Arial',12))
-        self.data_label = Label(self.root,text='Data',bg='white',font=('Arial',12))
-        self.input_label = Label(self.root,text='Input Here:(e.g.{"name":"LiHua"})',bg='white',font=('Arial',15))
+        self.db_label = Label(self.root,text='数据库',bg='white',font=('Arial',12),)
+        self.col_label = Label(self.root,text='集合',bg='white',font=('Arial',12))
+        self.data_label = Label(self.root,text='数据',bg='white',font=('Arial',12))
+        self.input_label = Label(self.root,text='在这里输入:(e.g.{"name":"LiHua"})',bg='white',font=('Arial',15))
 
         self.db_label.place(x=30,y=0,anchor='nw')
         self.col_label.place(x=180,y=0,anchor='nw')
@@ -47,27 +47,32 @@ class MongoDB_GUI(object):
     def set_listbox(self):
         self.db_list = Listbox(self.root)
         self.col_list = Listbox(self.root)
+        self.load_db_list()
+        self.load_col_list()
 
-        self.load_listbox()
+        self.db_list.bind('<ButtonPress>',lambda e:self.load_col_list())
+        self.db_list.bind('<ButtonRelease>',lambda e:self.load_col_list())
 
-    def load_listbox(self):
+    def load_db_list(self):
         for db_name in self.func.load_db_names():
-            self.db_list.insert('end',db_name)
+            self.db_list.insert(0,db_name)
 
         self.db_list.place(x=0,y=25,anchor='nw')
 
+    def load_col_list(self):
+        self.col_list.delete(first=0,last='end')
         for col in self.func.load_col_names(self.db_list):
-            self.col_list.insert('end',col)
+            self.col_list.insert(0,col)
 
         self.col_list.place(x=150,y=25,anchor='nw')
 
     def set_button(self):
-        self.b_create_db = Button(self.root,width=15,height=1,text='create database',command=self.func.create_db())
-        self.b_delete_db = Button(self.root,width=15,height=1,text='delete database',command=lambda:self.func.delete_db(self.db_list))
-        self.b_create_col = Button(self.root,width=15,height=1,text='create collection')
-        self.b_delete_col = Button(self.root,width=15,height=1,text='delete collection')
-        self.b_commit_data = Button(self.root,width=25,height=2,text='commit')
-        self.b_delete_data = Button(self.root,width=25,height=2,text='delete')
+        self.b_create_db = Button(self.root,width=15,height=1,text='创建数据库',command=lambda:self.func.create_db(self.db_list))
+        self.b_delete_db = Button(self.root,width=15,height=1,text='删除数据库',command=lambda:self.func.delete_db(self.db_list,self.col_list))
+        self.b_create_col = Button(self.root,width=15,height=1,text='创建集合',command=lambda:self.func.create_col(self.db_list,self.col_list))
+        self.b_delete_col = Button(self.root,width=15,height=1,text='删除集合',command=lambda:self.func.delete_col(self.db_list,self.col_list))
+        self.b_commit_data = Button(self.root,width=25,height=2,text='确认')
+        self.b_delete_data = Button(self.root,width=25,height=2,text='撤销',command=self.input_text.edit_undo)
 
         self.b_create_db.place(x=300,y=25,anchor='nw')
         self.b_delete_db.place(x=300,y=70,anchor='nw')
@@ -79,7 +84,6 @@ class MongoDB_GUI(object):
     def set_all(self):
         self.set_root_window()
         self.set_menu()
-        #self.set_frame()
         self.set_text()
         self.set_label()
         self.set_listbox()
